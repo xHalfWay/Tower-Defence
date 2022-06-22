@@ -1,7 +1,7 @@
 import math
 import pygame
+from pygame import font, draw, K_SPACE, K_s, K_w, KEYDOWN, display
 import Menu
-
 
 Menu.screen
 
@@ -27,6 +27,36 @@ window = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Стреляющие Башни")
 clock = pygame.time.Clock()
 
+ARIAL_30 = font.SysFont('arial', 50)
+
+class Button:
+    def __init__(self):
+        self._options = []
+        self._callbacks = []
+        self._current_option_index = 0
+
+    def append_option(self, option, callback):
+        self._options.append(ARIAL_30.render(option, True, (255, 255, 255)))
+        self._callbacks.append(callback)
+
+    def switch(self, direction):
+        self._current_option_index = max(0, min(self._current_option_index + direction, len(self._options) - 1))
+
+    def select(self):
+        self._callbacks[self._current_option_index]()
+
+    def draw(self, surf, x, y, option_y_padding):
+        for i, option in enumerate(self._options):
+            option_rect: pygame.Rect = option.get_rect()
+            option_rect.topleft = (x, y + i * option_y_padding)
+            if i == self._current_option_index:
+                draw.rect(surf, (0, 100, 0), option_rect)
+            surf.blit(option, option_rect)
+
+run = True
+def quit_game():
+    global running
+    running = False
 
 def Draw_Window():
     mouse_pos = pygame.mouse.get_pos()
@@ -132,24 +162,24 @@ class Player:
 
 
 Map = [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 3, 1, 1, 1, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 9, 1, 1, 1, 1, 10],
-    [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-    [1, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 5, 1, 1, 1, 6, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 1, 1, 1, 8, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [1, 1, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 6, 1, 1, 1, 1, 5, 0, 0],
+    [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+    [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+    [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+    [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+    [0, 0, 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 10, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9, 0, 0],
+    [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+    [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+    [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+    [0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0],
+    [0, 0, 11, 1, 1, 1, 1, 12, 0, 0, 0, 0, 7, 1, 1, 1, 1, 8, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 ]
@@ -222,7 +252,6 @@ def Checking_Towers_Building(x, y):
             return False
     return True
 
-
 def Checking_enemy_death():
     global Level_of_enemy
     for enemy in enemies:
@@ -231,14 +260,33 @@ def Checking_enemy_death():
             player.money += enemy.reward
     if len(enemies) == 0:
         Level_of_enemy += 1
-        Creating_Enemy(100 * Level_of_enemy, 2 + Level_of_enemy / 10, 10, red, 10 * Level_of_enemy)
-
+        Creating_Enemy(100 * Level_of_enemy, 2 + Level_of_enemy / 10, 10, pink, 10 * Level_of_enemy)
 
 def Checking_player_death():
-    if player.health <= 0:
-        global run
-        run = False
 
+     if player.health <= 0:
+        pygame.display.set_caption("Конец игры!")
+        window = pygame.display.set_mode((800, 600))
+        window.fill((0, 0, 0))
+        text1 = f2.render('Конец игры!', 1, (180, 0, 0))
+        window.blit(text1, (300, 125))
+        schet = f2.render("Вы смогли набрать очков:", False, yellow)
+        window.blit(schet, (220, 175))
+        window.blit(money, (375, 225))
+        button.draw(window, 330, 300, 55)
+        button.append_option('Закончить', exit)
+        pygame.display.update()
+
+        while 1:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    exit()
+                if event.type == KEYDOWN:
+                    button.select()
+
+            button.draw(window, 315, 300, 45)
+
+            display.flip()
 
 def Calculating(x1, y1, x2, y2):
     vec_x = x2 - x1
@@ -279,22 +327,31 @@ Create_enemy_points(10)
 Creating_Enemy(100, 3, 10, pink, 10)
 player = Player(100, 10)
 
-run = True
+button = Button()
+
 while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
+        if event.type == KEYDOWN:
+            if event.key == K_w:
+                button.switch(-1)
+            elif event.key == K_s:
+                button.switch(1)
+            elif event.key == K_SPACE:
+                button.select()
+
 
     window.fill(black)
     Main()
-    monet = f2.render("Монеты:", False, yellow)
-    window.blit(monet, (10, 0))
-    lives = f2.render("Здоровье:", False, red)
-    window.blit(lives, (10, 30))
-    money = f2.render(str(player.money), False, yellow)
-    health = f2.render(str(player.health), False, red)
-    window.blit(money, (145, 0))
-    window.blit(health, (155, 30))
+    monet = f2.render("Монеты:", False, yellow, black)
+    window.blit(monet, (0, 0))
+    lives = f2.render("Здоровье:", False, red, black)
+    window.blit(lives, (520, 0))
+    money = f2.render(str(player.money), False, yellow, black)
+    health = f2.render(str(player.health), False, red, black)
+    window.blit(money, (131, 0))
+    window.blit(health, (665, 0))
 
     pygame.display.update()
     clock.tick(30)
